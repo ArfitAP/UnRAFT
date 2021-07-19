@@ -1,0 +1,40 @@
+Repozitorij za nenadzirano učenje arhitekture RAFT - UnRAFT
+
+Implementacija arhitekture RAFT se nalazi u mapi core, a pomoćne funkcije u mapi core/utils.
+
+Mapa models sadrži pohranjene modele nakon određenih faza učenja:
+	- raft-chairs, raft-things, raft-small, raft-kitti, raft-sintel -> nadzirano učeni modeli javno dostupni od autora RAFT-a
+	- raft-chairs100k -> pokušaj reprodukcije nadziranog postupka učenja kojeg su predložili autori, bez izmjena. Provedeno je 100k iteracija.
+	- noc-chairs-small -> NOC model učen na flying chairs uz arhitekturu od 1M parametara (small)
+	- occ-chairs-small, occ-things-small -> OCC model učen na flying chairs/flying things uz arhitekturu od 1M parametara (small)
+	- noc-chairs -> NOC model učen na flying chairs uz arhitekturu od 5M parametara
+	- occ-chairs, occ-things -> OCC model učen na flying chairs/flying things uz arhitekturu od 5M parametara
+	- asym_occ-chairs -> učenje OCC modela uz asimetričnu foto transformaciju kod uvećanja podataka (data augmentation)
+	- occ-ft-sintel -> Učenje OCC modela na Sintel clean train skupu
+	- occ-city -> Učenje OCC modela na Cityscapes skupu uz korištenje težina dobivenih iz učenja OCC things
+	- raft-city -> Učenje OCC modela na Cityscapes skupu uz korištenje težina dobivenih iz modela kojeg su objavili autori RAFT-a
+
+
+Mapa training sadrži skripte za nenadzirano učenje.
+	- Naziv skripte govori koji model učenja implementira i na kojem skupu
+	- U svakoj skripti je potrebno ručno upisati path do dataseta. To se nalazi u funkciji "fetch_dataloader", a skripte su trenutno postavljene tako da datasetove učitavaju iz pohrane na colabu.
+	- Isto tako u funkciji "fetch_dataloader" možemo mijenjati veličinu područja slike koje se izrezuje za učenje uz ostale parametre za transformaciju (aug_params).
+	- Na kraju funkcije "train", potrebno je u varijablu "PATH" postaviti putanju u koju želimo spremati međurezultate kao i konačni model.
+	- Međurezultat učenja se sprema periodično na broj iteracija određen varijablom "CHECK_FREQ".
+
+
+
+Najvažnije postavke učenja (restore model, broj iteracija, bs, lr, ...) definiramo tako da ih unosimo kao argumente pri pokretanju skripte. Primjeri:
+
+python -u train_fchairsNOC.py --name noc-chairs-small --gpus 0 --num_steps 200000 --batch_size 4 --lr 0.0004 --wdecay 0.0001 --small
+
+python -u train_fchairsNOC.py --name noc-chairs --gpus 0 --num_steps 200000 --batch_size 4 --lr 0.0004 --wdecay 0.0001
+python -u train_fchairsOCC.py --name occ-chairs --gpus 0 --num_steps 100000 --batch_size 2 --lr 0.0002 --wdecay 0.0001
+python -u train_fthingsOCC.py --name occ-things --gpus 0 --num_steps 50000 --batch_size 2 --lr 0.0001 --wdecay 0.0001
+python -u train_sintelOCC.py --name occ-sintel --gpus 0 --num_steps 50000 --batch_size 2 --lr 0.0001 --wdecay 0.0001
+
+
+
+Korištenje skripti evaluate.py i demo.py je opisano u izvornom readme autora. Npr. evaluacija proizvoljnog modela iz mape models na skupu Sintel:
+python evaluate.py --model=models/occ-ft-sintel.pth --dataset=sintel 
+
