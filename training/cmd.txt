@@ -1,0 +1,19 @@
+python -u train_fchairsNOCss.py --name chairs --restore_ckpt checkpoints\52000_sschairs.pth --gpus 0 --num_steps 100000 --batch_size 1 --lr 0.0004 --wdecay 0.0001 --small
+
+python -u train_fchairsOCCss.py --name occchairs --restore_ckpt checkpoints\65000_noccchairs.pth --gpus 0 --num_steps 100000 --batch_size 1 --lr 0.0001 --wdecay 0.0001 --small
+
+python -u chairsNOCnew.py --name rsmall-chairsnoc --restore_ckpt checkpoints\noc-chairs.pth --gpus 0 --num_steps 100000 --batch_size 1 --lr 0.0002 --wdecay 0.0001 --small
+
+python evaluate.py --model=models/25000_sschairs.pth --dataset=chairs --small
+
+
+
+python -u train.py --name raft-chairs --restore_ckpt checkpoints\raft-chairs140k.pth --stage chairs --gpus 0 --num_steps 100000 --batch_size 1 --lr 0.0001 --image_size 368 496 --wdecay 0.0001
+
+
+mklink /D FlyingThings3D E:\RAFT datasets\FlyingThings
+
+
+
+
+bundler C:\Users\Antonio\Documents\RAFT\RAFT-master\sintel_submission\clean C:\Users\Antonio\Documents\RAFT\RAFT-master\sintel_submission\final .\UnRaft-ft.lzma
